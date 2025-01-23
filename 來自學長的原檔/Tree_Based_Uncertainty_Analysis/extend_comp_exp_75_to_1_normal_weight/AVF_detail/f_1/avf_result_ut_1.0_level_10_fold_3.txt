@@ -1,0 +1,18 @@
+TP:20 TN:1475 FP:11 FN:151 IP:4 IN:2
+
+
+                    accuracy: 0.9022329511164756
+                    precision: 0.6451612903225806
+                    recall: 0.11695906432748537
+                    f1: 0.19801980198019803
+                    ppv: 0.6451612903225806
+                    npv: 0.9071340713407134
+                    error: 0.0974143114852676
+                    leakage: 0.09079975947083584
+                    overkill: 0.00661455201443175
+                    indeterminate: 0.0036079374624173183
+                    imperfection: 0.10102224894768491
+                    indeterminate-adjusted precision: 0.6060606060606061
+                    indeterminate-adjusted Recall: 0.13714285714285715
+                    indeterminate-adjusted f1: 0.22367194780987884
+                    
