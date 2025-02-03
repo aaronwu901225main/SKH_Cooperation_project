@@ -26,11 +26,11 @@ import argparse
 '''
 
 # 指定字體
-'''
+
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 
-font_dirs = ['/usr/share/fonts/truetype/']
+font_dirs = [r'..\..\font']
 font_files = font_manager.findSystemFonts(fontpaths=font_dirs)
 
 for font_file in font_files:
@@ -39,7 +39,7 @@ plt.rcParams['font.family'] = "Noto Sans Mono CJK TC"
 
 import os
 
-font_path = '/usr/share/fonts/truetype/NotoSansMonoCJKtc-Regular.otf'
+font_path = r'..\..\font\NotoSansCJK-Regular.ttc'
 if os.path.exists(font_path):
     print("字體文件存在於系統中。")
 else:
@@ -50,7 +50,7 @@ import matplotlib.pyplot as plt
 # 清除 Matplotlib 緩存
 plt.rcParams.update({'font.family': 'Noto Sans Mono CJK TC'})
 plt.close('all')
-'''
+
 
 '''
 讀取資料
