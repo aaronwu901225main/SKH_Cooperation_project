@@ -35,8 +35,8 @@
 ## 4. 方法
 ### 4.1 模型架構
 - 使用 **決策樹、隨機森林、XGBoost** 組成 **Soft Voting** 模型。
-- 為了解決數據不平衡問題，在 XGBoost 設置 `scale_pos_weight` 參數。
-- 採用 K 折交叉驗證（K-Fold Cross-Validation）以確保模型穩定性。
+- 為了解決數據不平衡問題，在 XGBoost 設置 `scale_pos_weight` 參數 (reweight)。
+- 採用 K 折交叉驗證（K-Fold Cross-Validation）以確保模型穩定性。(K 折交叉驗證（K-Fold Cross-Validation, K-Fold CV）透過將數據集分成 K 個子集，來反覆訓練與測試模型，以確保模型的穩定性與泛化能力。)
 
 ### 4.2 多重擾動不確定性估計（Multipass Indeterminacy Estimation）
 1. **對樣本加入高斯雜訊（Gaussian Noise）**，模擬血流量的變動。
