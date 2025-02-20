@@ -180,9 +180,10 @@ for mul in tqdm(uncertain_mul, desc=f"uncertain_threshold :"):
             thres_list = []
     #         print(f'*********\nAVF :{threshold_output_index+1}/3\n{noise_level}\n*********')
             model = VotingClassifier(estimators=[('mlp_1', mlp),
+                                                 ('rf', RandomForestClassifier(random_state=42,n_estimators=50,max_depth=4)),
                                                  ('dt', DecisionTreeClassifier(random_state=42,max_depth=5)),
                                                  ('xgb2', XGBClassifier(random_state=42,scale_pos_weight=data_scale_pos_weight,eta=0.001,n_estimators=50))#,eta=0.016,n_estimators=100
-                                                ], voting='soft', weights=[1, 1, 1])#
+                                                ], voting='soft', weights=[1, 1, 1, 1])#
             model.fit(X_train, y_train)
 
             prob_head = []
