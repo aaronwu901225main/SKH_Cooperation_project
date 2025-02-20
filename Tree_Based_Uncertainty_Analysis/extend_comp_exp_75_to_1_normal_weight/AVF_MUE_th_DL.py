@@ -2,21 +2,15 @@
 from sklearn.model_selection import KFold
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, auc, confusion_matrix, f1_score, precision_score, recall_score
 import matplotlib.pyplot as plt
 import math
 from tqdm import tqdm
 import csv
-from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.preprocessing import StandardScaler
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from pytorch_tabnet.tab_model import TabNetClassifier
-from torchkeras.tabular.models import FTTransformerConfig, FTTransformerModel
-
 
 from sklearn.tree import plot_tree
 import warnings
@@ -105,75 +99,6 @@ df_tree['術後至檢測的天數差'] = df_tree['術後至檢測的天數差'].
 def split_data(X, y, n_splits=3):
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
     return kf.split(X, y)
-'''
-深度學習模型
-'''
-class MLPClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self, input_dim, hidden_dim=128, output_dim=2, epochs=50, lr=0.001):
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.output_dim = output_dim
-        self.epochs = epochs
-        self.lr = lr
-        self.model = self.build_model()
-        self.scaler = StandardScaler()
-    
-    def build_model(self):
-        return nn.Sequential(
-            nn.Linear(self.input_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.output_dim),
-            nn.Softmax(dim=1)
-        )
-    
-    def fit(self, X, y):
-        X = self.scaler.fit_transform(X)
-        X_tensor = torch.tensor(X, dtype=torch.float32)
-        y_tensor = torch.tensor(y.values, dtype=torch.long)
-        criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
-        
-        for epoch in range(self.epochs):
-            optimizer.zero_grad()
-            outputs = self.model(X_tensor)
-            loss = criterion(outputs, y_tensor)
-            loss.backward()
-            optimizer.step()
-    
-    def predict_proba(self, X):
-        X = self.scaler.transform(X)
-        X_tensor = torch.tensor(X, dtype=torch.float32)
-        with torch.no_grad():
-            outputs = self.model(X_tensor).numpy()
-        return outputs
-
-class TabNetWrapper(BaseEstimator, ClassifierMixin):
-    def __init__(self):
-        self.model = TabNetClassifier()
-    
-    def fit(self, X, y):
-        self.model.fit(X.values, y.values, max_epochs=50, patience=10)
-    
-    def predict_proba(self, X):
-        return self.model.predict_proba(X.values)
-
-# 設定 Tabular Transformer
-class FTTransformerWrapper(BaseEstimator, ClassifierMixin):
-    def __init__(self, input_dim, hidden_dim=128, output_dim=2):
-        self.input_dim = input_dim
-        config = FTTransformerConfig(input_dim=self.input_dim, hidden_dim=hidden_dim, output_dim=output_dim)
-        self.model = FTTransformerModel(config)
-        self.scaler = StandardScaler()
-    
-    def fit(self, X, y):
-        X = self.scaler.fit_transform(X)
-    
-    def predict_proba(self, X):
-        X = self.scaler.transform(X)
-        X_tensor = torch.tensor(X, dtype=torch.float32)
-        with torch.no_grad():
-            outputs = self.model(X_tensor).numpy()
-        return outputs
 
 '''迴圈起'''
 uncertain_mul = [0.9, 0.95, 1.0]
@@ -225,11 +150,10 @@ for mul in tqdm(uncertain_mul, desc=f"uncertain_threshold :"):
             npv_avf_list = []
             thres_list = []
     #         print(f'*********\nAVF :{threshold_output_index+1}/3\n{noise_level}\n*********')
-            model = VotingClassifier(estimators=[
-                ('mlp', MLPClassifier(input_dim=X_train.shape[1])),
-                ('tabnet', TabNetWrapper()),
-                ('fttransformer', FTTransformerWrapper(input_dim=X_train.shape[1]))
-            ], voting='soft', weights=[1, 1, 1])#
+            model = VotingClassifier(estimators=[('rf', RandomForestClassifier(random_state=42,n_estimators=50,max_depth=4)),
+                                                 ('dt', DecisionTreeClassifier(random_state=42,max_depth=5)),
+                                                 ('xgb2', XGBClassifier(random_state=42,scale_pos_weight=data_scale_pos_weight,eta=0.001,n_estimators=50))#,eta=0.016,n_estimators=100
+                                                ], voting='soft', weights=[1, 1, 1])#
             model.fit(X_train, y_train)
 
             prob_head = []
