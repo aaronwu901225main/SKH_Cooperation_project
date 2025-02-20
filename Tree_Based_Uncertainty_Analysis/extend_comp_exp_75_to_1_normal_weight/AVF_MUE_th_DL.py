@@ -16,6 +16,8 @@ import csv
 import torch
 from pytorch_tabnet.tab_model import TabNetClassifier
 from sklearn.neural_network import MLPClassifier
+from pytorch_tabnet.tab_model import TabNetClassifier
+from sklearn.base import BaseEstimator, ClassifierMixin
 
 from sklearn.tree import plot_tree
 import warnings
