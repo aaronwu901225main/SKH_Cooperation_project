@@ -103,9 +103,21 @@ df_tree['術後至檢測的天數差'] = df_tree['術後至檢測的天數差'].
 '''
 # MLP 模型
 mlp = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42)
+class SklearnTabNet(BaseEstimator, ClassifierMixin):
+    def __init__(self):
+        self.model = TabNetClassifier()
 
+    def fit(self, X, y):
+        self.model.fit(X, y, max_epochs=100, patience=10, batch_size=1024, virtual_batch_size=128, num_workers=0)
+        return self
+
+    def predict(self, X):
+        return np.argmax(self.model.predict_proba(X), axis=1)
+
+    def predict_proba(self, X):
+        return self.model.predict_proba(X)
 # FT-Transformer (使用 TabNet 替代)
-tabnet = TabNetClassifier()
+tabnet = SklearnTabNet()
 
 '''
 訓練+驗證
