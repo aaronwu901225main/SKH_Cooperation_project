@@ -198,7 +198,7 @@ for mul in tqdm(uncertain_mul, desc=f"uncertain_threshold :"):
                         eta = np.random.normal(0, noise_level)# noise
         #                 print(eta)
                         row[1] += eta# A值
-                        y_test_proba = model.predict_proba([row]).tolist()[0]#[:, 1] [False, True]
+                        y_test_proba = model.predict_proba(np.array(row).reshape(1, -1)).tolist()[0]#[:, 1] [False, True]
                         prob_head.append(y_test_proba)
                     prob_mean = [np.mean(np.array(prob_head)[:, 0]),np.mean(np.array(prob_head)[:, 1])]#np.mean(np.array(prob_head)[:, 0])
                     prob_variance = [np.var(np.array(prob_head)[:, 0]), np.var(np.array(prob_head)[:, 1])]# np.var(np.array(prob_head)[:, 0])
