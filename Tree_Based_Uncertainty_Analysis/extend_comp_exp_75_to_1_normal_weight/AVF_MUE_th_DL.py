@@ -12,6 +12,11 @@ import math
 from tqdm import tqdm
 import csv
 
+# Deep Learning 相關
+import torch
+from pytorch_tabnet.tab_model import TabNetClassifier
+from sklearn.neural_network import MLPClassifier
+
 from sklearn.tree import plot_tree
 import warnings
 warnings.filterwarnings("ignore")
@@ -94,6 +99,15 @@ df_tree = df_tree.drop(columns=['condition 1'])
 df_tree['術後至檢測的天數差'] = df_tree['術後至檢測的天數差'].replace([np.nan, -np.nan], 0)
 
 '''
+模型
+'''
+# MLP 模型
+mlp = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42)
+
+# FT-Transformer (使用 TabNet 替代)
+tabnet = TabNetClassifier()
+
+'''
 訓練+驗證
 '''
 def split_data(X, y, n_splits=3):
@@ -150,8 +164,8 @@ for mul in tqdm(uncertain_mul, desc=f"uncertain_threshold :"):
             npv_avf_list = []
             thres_list = []
     #         print(f'*********\nAVF :{threshold_output_index+1}/3\n{noise_level}\n*********')
-            model = VotingClassifier(estimators=[('rf', RandomForestClassifier(random_state=42,n_estimators=50,max_depth=4)),
-                                                 ('dt', DecisionTreeClassifier(random_state=42,max_depth=5)),
+            model = VotingClassifier(estimators=[('mlp', mlp),
+                                                 ('tabnet', tabnet),
                                                  ('xgb2', XGBClassifier(random_state=42,scale_pos_weight=data_scale_pos_weight,eta=0.001,n_estimators=50))#,eta=0.016,n_estimators=100
                                                 ], voting='soft', weights=[1, 1, 1])#
             model.fit(X_train, y_train)
