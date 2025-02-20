@@ -105,6 +105,8 @@ df_tree['術後至檢測的天數差'] = df_tree['術後至檢測的天數差'].
 '''
 # MLP 模型
 mlp = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=500, random_state=42)
+'''
+# FT-Transformer (使用 TabNet 替代)
 class SklearnTabNet(BaseEstimator, ClassifierMixin):
     def __init__(self):
         self.model = TabNetClassifier()
@@ -118,9 +120,8 @@ class SklearnTabNet(BaseEstimator, ClassifierMixin):
 
     def predict_proba(self, X):
         return self.model.predict_proba(X)
-# FT-Transformer (使用 TabNet 替代)
 tabnet = SklearnTabNet()
-
+'''
 '''
 訓練+驗證
 '''
@@ -179,7 +180,7 @@ for mul in tqdm(uncertain_mul, desc=f"uncertain_threshold :"):
             thres_list = []
     #         print(f'*********\nAVF :{threshold_output_index+1}/3\n{noise_level}\n*********')
             model = VotingClassifier(estimators=[('mlp', mlp),
-                                                 ('tabnet', tabnet),
+                                                 ('mlp', mlp),
                                                  ('xgb2', XGBClassifier(random_state=42,scale_pos_weight=data_scale_pos_weight,eta=0.001,n_estimators=50))#,eta=0.016,n_estimators=100
                                                 ], voting='soft', weights=[1, 1, 1])#
             model.fit(X_train, y_train)
