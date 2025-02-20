@@ -15,7 +15,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from pytorch_tabnet.tab_model import TabNetClassifier
-from tabtransformertf import FTTransformerConfig, FTTransformerModel
+from torchkeras.tabular.models import FTTransformerConfig, FTTransformerModel
 
 
 from sklearn.tree import plot_tree
